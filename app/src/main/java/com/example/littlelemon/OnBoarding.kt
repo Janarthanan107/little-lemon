@@ -1,5 +1,7 @@
 package com.example.littlelemon
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -23,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
@@ -33,10 +36,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
+import android.content.SharedPreferences
+
+class MyPreferences(context: Context) {
+    val sharedPreferences: SharedPreferences = context.getSharedPreferences("shared_prefs", Context.MODE_PRIVATE)
+
+    fun saveData(key: String, value: String) {
+        val editor: SharedPreferences.Editor = sharedPreferences.edit()
+        editor.putString(key, value)
+        editor.apply()
+    }
+
+    fun getData(key: String): String? {
+        return sharedPreferences.getString(key, null)
+    }
+}
 
 @Composable
-fun OnBoardingScreen() {
+fun OnBoardingScreen(navController: NavController) {
+    
+
+    val context= LocalContext.current
     var firstname by remember{
         mutableStateOf("")
     }
@@ -111,7 +133,12 @@ fun OnBoardingScreen() {
         TextField(value = email, onValueChange ={it:String-> email=it},modifier= Modifier
             .padding(start = 10.dp, bottom = 50.dp)
             .clip(RoundedCornerShape(10.dp)))
-        Button(onClick = { /*TODO*/ },shape= RoundedCornerShape(10.dp),modifier=Modifier.padding(start=10.dp,end=10.dp).fillMaxWidth(),colors=ButtonDefaults.buttonColors(containerColor=Color(0xFFF4CE14))) {
+        Button(onClick = { if(firstname.isBlank()&&lastname.isBlank()&&email.isBlank()){
+            Toast.makeText(context,"Registration successful!",Toast.LENGTH_LONG).show()
+            navController.navigate(Home.route)}
+                         else{Toast.makeText(context,"Registration unsuccessful. Please enter all data.",Toast.LENGTH_LONG).show()
+
+                         }},shape= RoundedCornerShape(10.dp),modifier=Modifier.padding(start=10.dp,end=10.dp).fillMaxWidth(),colors=ButtonDefaults.buttonColors(containerColor=Color(0xFFF4CE14))) {
             Text(text="Register",style = TextStyle( color = Color.Black,
                 fontFamily = karla))
 
@@ -122,8 +149,4 @@ fun OnBoardingScreen() {
 
     }
 }
-@Preview(showBackground=true)
-@Composable
-fun OnBoardingScreenPreview(){
-    OnBoardingScreen()
-}
+
