@@ -40,25 +40,22 @@ import androidx.navigation.NavController
 import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 import android.content.SharedPreferences
 
-class MyPreferences(context: Context) {
-    val sharedPreferences: SharedPreferences = context.getSharedPreferences("shared_prefs", Context.MODE_PRIVATE)
 
+
+@Composable
+fun OnBoardingScreen(navController: NavController) {
+
+
+    val context= LocalContext.current
+    val sharedPreferences: SharedPreferences = context.getSharedPreferences("shared_prefs", Context.MODE_PRIVATE)
     fun saveData(key: String, value: String) {
         val editor: SharedPreferences.Editor = sharedPreferences.edit()
         editor.putString(key, value)
         editor.apply()
     }
 
-    fun getData(key: String): String? {
-        return sharedPreferences.getString(key, null)
-    }
-}
 
-@Composable
-fun OnBoardingScreen(navController: NavController) {
-    
 
-    val context= LocalContext.current
     var firstname by remember{
         mutableStateOf("")
     }
@@ -133,10 +130,33 @@ fun OnBoardingScreen(navController: NavController) {
         TextField(value = email, onValueChange ={it:String-> email=it},modifier= Modifier
             .padding(start = 10.dp, bottom = 50.dp)
             .clip(RoundedCornerShape(10.dp)))
-        Button(onClick = { if(firstname.isBlank()&&lastname.isBlank()&&email.isBlank()){
+        Button(onClick = { if(firstname.isEmpty()){
+            Toast.makeText(
+                context,
+                "Registration unsuccessful. Please enter all data.",
+                Toast.LENGTH_LONG
+            ).show()
+          }
+            else if(lastname.isEmpty()){
+            Toast.makeText(
+                context,
+                "Registration unsuccessful. Please enter all data.",
+                Toast.LENGTH_LONG
+            ).show()
+        }
+            else if(email.isEmpty()){
+                Toast.makeText(
+                    context,
+                    "Registration unsuccessful. Please enter all data.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+                         else{
             Toast.makeText(context,"Registration successful!",Toast.LENGTH_LONG).show()
-            navController.navigate(Home.route)}
-                         else{Toast.makeText(context,"Registration unsuccessful. Please enter all data.",Toast.LENGTH_LONG).show()
+            navController.navigate(Home.route)
+            saveData("firstname",firstname)
+            saveData("lastname",lastname)
+            saveData("email",email)
 
                          }},shape= RoundedCornerShape(10.dp),modifier=Modifier.padding(start=10.dp,end=10.dp).fillMaxWidth(),colors=ButtonDefaults.buttonColors(containerColor=Color(0xFFF4CE14))) {
             Text(text="Register",style = TextStyle( color = Color.Black,

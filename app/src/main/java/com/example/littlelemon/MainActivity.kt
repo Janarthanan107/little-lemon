@@ -1,5 +1,7 @@
 package com.example.littlelemon
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -10,6 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,6 +24,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+
             MyNavigation()
 
 
@@ -31,19 +35,38 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MyNavigation() {
+    val context= LocalContext.current
+    val sharedPreferences: SharedPreferences = context.getSharedPreferences("shared_prefs", Context.MODE_PRIVATE)
+    fun saveData(key: String, value: String) {
+        val editor: SharedPreferences.Editor = sharedPreferences.edit()
+        editor.putString(key, value)
+        editor.apply()
+    }
+
+
+    fun getData(key: String): String? {
+        return sharedPreferences.getString(key, null)}
+    var firstname=getData("firstname")
+    val loggedIn = firstname?.isNotEmpty() == false
+
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = Home.route
-    ) {
+        startDestination = if (loggedIn) {
+            OnBoarding.route
+        } else {
+            Home.route
+        }
+    )
+     {
         composable(Home.route) {
             HomeScreen(navController = navController)
         }
         composable(Profile.route) {
-            ProfileScreen()
+            ProfileScreen(navController = navController)
         }
         composable(OnBoarding.route) {
-            OnBoardingScreen()
+            OnBoardingScreen(navController = navController)
         }
 
 
