@@ -29,8 +29,8 @@ import androidx.navigation.NavController
 
 @Composable
 fun HomeScreen(navController: NavController) {
-    var v by remember { mutableStateOf(" ") }
-
+    var v by remember { mutableStateOf("") }
+    var s by remember { mutableStateOf("") }
 
     val markazi = FontFamily(
         Font(R.font.markazi)
@@ -119,74 +119,48 @@ fun HomeScreen(navController: NavController) {
                 .background(color = Color.White)
                 .padding(10.dp)
         ) {
-            LowerPanel(v)
-        }
-    }
-}
-
-@Composable
-fun LowerPanel(searchText: String) {
-    val context= LocalContext.current
-    val sharedPreferences: SharedPreferences = context.getSharedPreferences("shared_prefs", Context.MODE_PRIVATE)
-    fun getData(key: String): String? {
-        return sharedPreferences.getString(key, null)}
-    var searchButton=getData("s")
-    val karla = FontFamily(
-        Font(R.font.karla)
-    )
-
-    Column {
-        Text(
-            text = "ORDER FOR DELIVERY!",
-            fontWeight = ExtraBold,
-            fontSize = 20.sp,
-            modifier = Modifier
-                .padding(start = 10.dp, end = 10.dp, top = 30.dp, bottom = 10.dp)
-        )
-        LazyRow {
-            items(Categories) { category ->
-                MenuCategory(category)
+            Column {
+                Text(
+                    text = "ORDER FOR DELIVERY!",
+                    fontWeight = ExtraBold,
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                        .padding(start = 10.dp, end = 10.dp, top = 30.dp, bottom = 10.dp)
+                )
+                LazyRow {
+                    items(Categories) { category ->
+                        Button(
+                            onClick = { s = category },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEDEFEE)),
+                            shape = RoundedCornerShape(40),
+                            contentPadding = PaddingValues(10.dp),
+                            modifier = Modifier.padding(start = 15.dp, end = 15.dp, bottom = 20.dp)
+                        ) {
+                            Text(
+                                fontWeight = ExtraBold,
+                                color = Color(0xFF495E57),
+                                text = category
+                            )
+                        }
+                    }
+                }
+                Divider(
+                    modifier = Modifier.padding(8.dp),
+                    color = Color.Gray,
+                    thickness = 1.dp
+                )
+                LazyColumn {
+                    items(Dishes.filter { it.name.contains(v, ignoreCase = true) && it.category.contains(s) }) { dish ->
+                        MenuDish(dish)
+                    }
+                }
             }
         }
-        Divider(
-            modifier = Modifier.padding(8.dp),
-            color = Color.Gray,
-            thickness = 1.dp
-        )
-        LazyColumn {
-            items(Dishes.filter { it.name.contains(searchText, ignoreCase = true)&&it.category==searchButton }) { dish ->
-                MenuDish(dish)
-            }
-        }
     }
 }
 
-@Composable
-fun MenuCategory(category: String) {
-    val karla = FontFamily(
-        Font(R.font.karla)
-    )
-    val context= LocalContext.current
-    val sharedPreferences: SharedPreferences = context.getSharedPreferences("shared_prefs", Context.MODE_PRIVATE)
-    fun saveData(key: String, value: String) {
-        val editor: SharedPreferences.Editor = sharedPreferences.edit()
-        editor.putString(key, value)
-        editor.apply()
-    }
-    Button(
-        onClick = { saveData("s",category )},
-        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEDEFEE)),
-        shape = RoundedCornerShape(40),
-        contentPadding = PaddingValues(10.dp),
-        modifier = Modifier.padding(start = 15.dp, end = 15.dp, bottom = 20.dp)
-    ) {
-        Text(
-            fontWeight = ExtraBold,
-            color = Color(0xFF495E57),
-            text = category
-        )
-    }
-}
+
+
 
 @Composable
 fun MenuDish(dish: Dish) {
@@ -243,7 +217,7 @@ data class Dish(
     val price: String,
     val description: String,
     val image: Int,
-    val category:String
+    val category: String
 )
 
 val Dishes = listOf(
@@ -251,30 +225,30 @@ val Dishes = listOf(
         "Greek Salad",
         "$12.99",
         "The famous Greek salad of crispy lettuce, peppers, olives, and our Chicago...",
-        R.drawable.greeksalad,"Starters"
+        R.drawable.greeksalad, "Starters"
     ),
     Dish(
-        "Bruschetta ",
+        "Bruschetta",
         "$7.99",
         "Our Bruschetta is made from grilled bread that has been smeared with garlic...",
-        R.drawable.bruschetta,"Starters"
+        R.drawable.bruschetta, "Starters"
     ),
     Dish(
         "Grilled Fish",
         "$20.00",
         "Barbequed catch of the day with red onion, crisp capers, chive creme fraiche...",
-        R.drawable.grilledfish,"Mains"
+        R.drawable.grilledfish, "Mains"
     ),
     Dish(
-        "Pasta ",
+        "Pasta",
         "$18.99",
         "Penne with fried aubergines, tomato sauce, fresh chili, basil & salted...",
-        R.drawable.pasta,"Mains"
+        R.drawable.pasta, "Mains"
     ),
     Dish(
         "Lemon Dessert",
         "$6.99",
         "This comes straight from grandma's recipe book, every last ingredient has...",
-        R.drawable.lemondessert,"Desserts"
+        R.drawable.lemondessert, "Desserts"
     )
 )
